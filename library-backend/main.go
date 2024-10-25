@@ -1,16 +1,18 @@
 package main
 
 import (
-    "net/http"
-    "flag"
-    "log"
-    "time"
-    "context"
-    "sync"
-    "github.com/gin-gonic/gin"
-    "google.golang.org/grpc"
+	"context"
+	"fmt"
+	"log"
+	pb "matheusferro/go-webservice/proto"
+	"net/http"
+	"os"
+	"sync"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-    pb "matheusferro/go-webservice/proto"
 )
 
 type Album struct {
@@ -19,10 +21,6 @@ type Album struct {
     Artist  string `json:"artist" binding:"required"`
     Price   float64 `json:"price" binding:"required"`
 }
-
-var (
-	addr = flag.String("addr", "localhost:50051", "the address to connect to")
-)
 
 var (
     dbClient pb.DatabaseClient
@@ -38,9 +36,8 @@ func databaseConnection() pb.DatabaseClient {
     mutex.Lock()
     defer mutex.Unlock()
     if dbClient == nil {
-        flag.Parse()
-	    // Set up a connection to the server.
-	    conn, err := grpc.NewClient(*addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+        addr := fmt.Sprintf("%s:%s", os.Getenv("DB_ACL_HOST"), os.Getenv("DB_ACL_PORT"))
+	    conn, err := grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	    if err != nil {
 	    	log.Fatalf("did not connect: %v", err)
             return nil
