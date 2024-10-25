@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package main;
+
+option go_package = "database/grpc";
+option java_multiple_files = true;
+option java_package = "io.grpc.database";
+option java_outer_classname = "DatabaseProto";
+
+service Database {
+
+    rpc GetAllAlbums(Empty) returns (AllAlbums) {};
+}
+
+message Empty {}
+
+message Album {
+    string id = 1;
+    string title = 2;
+    string artist = 3;
+    double price = 4; //TODO: Change to money after
+}
+
+message AllAlbums {
+    repeated Album albums = 1;
+}
+

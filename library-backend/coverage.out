@@ -1,0 +1,14 @@
+mode: set
+matheusferro/go-webservice/main.go:22.32,24.2 1 1
+matheusferro/go-webservice/main.go:26.35,29.34 2 1
+matheusferro/go-webservice/main.go:29.34,30.27 1 1
+matheusferro/go-webservice/main.go:30.27,33.10 2 1
+matheusferro/go-webservice/main.go:36.5,36.77 1 1
+matheusferro/go-webservice/main.go:39.33,41.49 2 1
+matheusferro/go-webservice/main.go:41.49,44.6 2 1
+matheusferro/go-webservice/main.go:45.5,45.34 1 1
+matheusferro/go-webservice/main.go:45.34,46.36 1 1
+matheusferro/go-webservice/main.go:46.36,49.10 2 1
+matheusferro/go-webservice/main.go:52.5,53.49 2 1
+matheusferro/go-webservice/main.go:56.32,63.2 5 1
+matheusferro/go-webservice/main.go:65.13,68.2 2 0

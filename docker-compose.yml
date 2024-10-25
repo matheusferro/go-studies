@@ -1,0 +1,16 @@
+name: library
+
+services:
+  postgres:
+    container_name: postgresql_auth
+    image: postgres:14
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=library-db
+    volumes:
+      - "./local-config/00_setupdb.sql:/docker-entrypoint-initdb.d/00_setupdb.sql"
+      - "./local-config/01_populate.sql:/docker-entrypoint-initdb.d/01_populatedb.sql"
+

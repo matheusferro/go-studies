@@ -2,7 +2,15 @@ package main
 
 import (
     "net/http"
+    "flag"
+    "log"
+    "time"
+    "context"
+    "sync"
     "github.com/gin-gonic/gin"
+    "google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+    pb "matheusferro/go-webservice/proto"
 )
 
 type Album struct {
@@ -12,15 +20,51 @@ type Album struct {
     Price   float64 `json:"price" binding:"required"`
 }
 
+var (
+	addr = flag.String("addr", "localhost:50051", "the address to connect to")
+)
+
+var (
+    dbClient pb.DatabaseClient
+    mutex sync.Mutex
+)
 
 var albums = []Album{
     {ID: "1", Title: "The Dark Side Of the Moon", Artist: "Pink Floyd", Price: 99.99},
     {ID: "2", Title: "Black Sabbath", Artist: "Black Sabbath", Price: 99.99},
 }
 
+func databaseConnection() pb.DatabaseClient {
+    mutex.Lock()
+    defer mutex.Unlock()
+    if dbClient == nil {
+        flag.Parse()
+	    // Set up a connection to the server.
+	    conn, err := grpc.NewClient(*addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	    if err != nil {
+	    	log.Fatalf("did not connect: %v", err)
+            return nil
+	    }
+        dbClient = pb.NewDatabaseClient(conn)
+    }
+    return dbClient
+}
 
 func getAlbums(c *gin.Context) {
-    c.IndentedJSON(http.StatusOK, albums)
+    databaseConn := databaseConnection()
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	r, err := databaseConn.GetAllAlbums(ctx, &pb.Empty{})
+	if err != nil {
+		log.Fatalf("could not get albums: %v", err)
+	}
+    allAlbums := make([]*Album, 0, len(r.Albums))
+    for _, ab := range r.Albums {
+        //log.Printf("Album title: %s", ab.Title)
+        allAlbums = append(allAlbums, &Album{ID: ab.Id, Title: ab.Title, Artist: ab.Artist, Price: ab.Price})
+    }
+    c.IndentedJSON(http.StatusOK, allAlbums)
+
 }
 
 func getAlbumByID(c *gin.Context) {
